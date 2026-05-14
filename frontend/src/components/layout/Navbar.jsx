@@ -10,8 +10,16 @@ export default function Navbar({ onMenu }) {
   const [dark, setDark] = useState(document.documentElement.classList.contains("dark"));
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
-    setDark(document.documentElement.classList.contains("dark"));
+    const nextIsDark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", nextIsDark);
+    document.documentElement.classList.toggle("light", !nextIsDark);
+    document.documentElement.dataset.theme = nextIsDark ? "dark" : "light";
+    try {
+      localStorage.setItem("campusbridge-theme", nextIsDark ? "dark" : "light");
+    } catch {
+      // Theme still updates for the current session if storage is unavailable.
+    }
+    setDark(nextIsDark);
   };
 
   return (
@@ -23,7 +31,7 @@ export default function Navbar({ onMenu }) {
         <Link to="/dashboard" className="text-lg font-extrabold tracking-tight">
           Campus<span className="text-brand-600">Bridge</span>
         </Link>
-        <button onClick={() => navigate("/search")} className="ml-auto hidden min-w-72 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-left text-sm text-slate-500 md:flex dark:border-slate-800 dark:bg-slate-900">
+        <button onClick={() => navigate("/search")} className="ml-auto hidden min-w-72 items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-left text-sm text-slate-500 transition hover:border-brand-500 hover:bg-white hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-brand-100 md:flex dark:border-slate-800 dark:bg-slate-900 dark:hover:border-brand-500 dark:hover:bg-slate-900/80 dark:hover:text-slate-200 dark:focus:ring-brand-500/20">
           <Search className="h-4 w-4" /> Search people, posts, colleges
         </button>
         <button className="btn-ghost px-3" onClick={toggleTheme} aria-label="Toggle theme">

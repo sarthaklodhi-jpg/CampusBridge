@@ -90,5 +90,5 @@ export const analyticsApi = {
 };
 
 export const searchApi = {
-  global: (params) => api.get("/search", { params })
+  global: (params, config = {}) => api.get("/search", { params, ...config })
 };

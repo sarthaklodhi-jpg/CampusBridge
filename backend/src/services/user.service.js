@@ -5,6 +5,8 @@ import { uploadBufferToCloudinary } from "../utils/cloudinaryUpload.js";
 
 const publicPopulate = "name slug logo";
 
+const escapeRegex = (value = "") => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export const getMe = (userId) =>
   User.findById(userId).select("-password -refreshTokens").populate("college", publicPopulate);
 
@@ -36,9 +38,22 @@ export const getProfile = async (username) => {
 
 export const searchUsers = async (query, currentUser) => {
   const { page, limit, skip } = getPagination(query);
+  const term = String(query.q || "").trim();
+  const searchFilter = term
+    ? {
+        $or: [
+          { name: { $regex: escapeRegex(term), $options: "i" } },
+          { username: { $regex: escapeRegex(term), $options: "i" } },
+          { branch: { $regex: escapeRegex(term), $options: "i" } },
+          { bio: { $regex: escapeRegex(term), $options: "i" } },
+          { skills: { $regex: escapeRegex(term), $options: "i" } }
+        ]
+      }
+    : {};
   const filter = {
     _id: { $ne: currentUser._id },
-    ...(query.q ? { $text: { $search: query.q } } : {}),
+    isActive: true,
+    ...searchFilter,
     ...(query.collegeOnly === "true" && currentUser.college ? { college: currentUser.college } : {})
   };
 

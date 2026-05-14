@@ -46,7 +46,7 @@ function PostCard({ post }) {
   };
 
   return (
-    <article className="surface rounded-lg p-5">
+    <article className="surface rounded-lg p-5 hover:border-slate-300 dark:hover:border-slate-600">
       <div className="flex items-start gap-3">
         <img className="h-11 w-11 rounded-full object-cover" src={post.author?.profilePicture || `https://api.dicebear.com/9.x/initials/svg?seed=${post.author?.name || "CB"}`} alt="" />
         <div className="min-w-0 flex-1">

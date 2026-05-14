@@ -34,7 +34,13 @@ export default function RegisterPage() {
           <Input label="Branch" value={form.branch} onChange={(event) => update("branch", event.target.value)} />
           <Input label="Year" type="number" min="1" max="8" value={form.year} onChange={(event) => update("year", event.target.value)} />
         </div>
-        <Input label="College join code" value={form.joinCode} onChange={(event) => update("joinCode", event.target.value.toUpperCase())} />
+        <Input
+          label="College join code (optional)"
+          value={form.joinCode}
+          onChange={(event) => update("joinCode", event.target.value.toUpperCase())}
+          placeholder="CBR-2DD5-C1"
+          helperText="Optional for now. For testing, you can use: CBR-2DD5-C1"
+        />
         <Button className="w-full">Create account</Button>
       </form>
     </AuthCard>

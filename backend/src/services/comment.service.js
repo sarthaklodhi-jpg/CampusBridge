@@ -14,7 +14,7 @@ export const createComment = async (payload, user) => {
 
   let parentComment = null;
   if (payload.parent) {
-    parentComment = await Comment.findOne({ _id: payload.parent, post: post._id });
+    parentComment = await Comment.findOne({ _id: payload.parent, post: post._id, deletedAt: null });
     const parent = parentComment;
     if (!parent) throw new ApiError(404, "Parent comment not found");
     if (parent.deletedAt) throw new ApiError(400, "Cannot reply to a deleted comment");
@@ -62,7 +62,7 @@ export const listComments = async (postId, query, user) => {
 
   const { page, limit, skip } = getPagination(query);
   const parent = query.parent || null;
-  const filter = { post: postId, parent };
+  const filter = { post: postId, parent, deletedAt: null };
   const [items, total] = await Promise.all([
     Comment.find(filter).populate("author", "name username profilePicture role").sort({ createdAt: 1 }).skip(skip).limit(limit).lean(),
     Comment.countDocuments(filter)
@@ -95,8 +95,29 @@ export const deleteComment = async (commentId, user) => {
   const comment = await Comment.findById(commentId);
   if (!comment) throw new ApiError(404, "Comment not found");
   if (!comment.author.equals(user._id)) throw new ApiError(403, "You cannot delete this comment");
-  comment.content = "This comment was deleted";
-  comment.deletedAt = new Date();
-  await comment.save();
-  return comment;
+
+  const post = await Post.findById(comment.post);
+  if (!post) throw new ApiError(404, "Post not found");
+
+  const ids = [comment._id];
+  let frontier = [comment._id];
+
+  while (frontier.length) {
+    const children = await Comment.find({ parent: { $in: frontier } }).select("_id").lean();
+    frontier = children.map((child) => child._id);
+    ids.push(...frontier);
+  }
+
+  const { deletedCount } = await Comment.deleteMany({ _id: { $in: ids } });
+
+  post.commentsCount = Math.max(0, post.commentsCount - deletedCount);
+  const updates = [post.save()];
+
+  if (comment.parent) {
+    updates.push(Comment.findOneAndUpdate({ _id: comment.parent, repliesCount: { $gt: 0 } }, { $inc: { repliesCount: -1 } }));
+  }
+
+  await Promise.all(updates);
+
+  return { deletedId: comment._id, deletedCount };
 };

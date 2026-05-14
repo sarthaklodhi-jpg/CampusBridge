@@ -27,7 +27,7 @@ export default function Sidebar({ open, onClose }) {
     <>
       <div className={`fixed inset-0 z-40 bg-slate-950/40 transition lg:hidden ${open ? "opacity-100" : "pointer-events-none opacity-0"}`} onClick={onClose} />
       <aside className={`fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-72 border-r border-white/70 bg-white/90 p-4 backdrop-blur-xl transition lg:sticky lg:z-20 lg:block lg:translate-x-0 dark:border-slate-800 dark:bg-slate-950/90 ${open ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="rounded-lg bg-slate-100 p-4 dark:bg-slate-900">
+        <div className="rounded-lg bg-slate-100 p-4 ring-1 ring-transparent transition dark:bg-slate-900 dark:ring-slate-800/70">
           <div className="flex items-center gap-3">
             {user?.college ? <Network className="h-5 w-5 text-brand-600" /> : <Building2 className="h-5 w-5 text-brand-600" />}
             <div>
@@ -38,7 +38,7 @@ export default function Sidebar({ open, onClose }) {
         </div>
         <nav className="mt-4 space-y-1">
           {visibleLinks.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} onClick={onClose} className={({ isActive }) => `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${isActive ? "bg-brand-600 text-white shadow-soft" : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900"}`}>
+            <NavLink key={to} to={to} onClick={onClose} className={({ isActive }) => `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition duration-200 ${isActive ? "bg-brand-600 text-white shadow-soft ring-1 ring-brand-500/30" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"}`}>
               <Icon className="h-4 w-4" /> {label}
             </NavLink>
           ))}

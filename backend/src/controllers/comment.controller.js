@@ -18,6 +18,6 @@ export const toggleLike = asyncHandler(async (req, res) => {
 });
 
 export const deleteComment = asyncHandler(async (req, res) => {
-  const comment = await commentService.deleteComment(req.params.id, req.user);
-  sendResponse(res, 200, "Comment deleted", { comment });
+  const result = await commentService.deleteComment(req.params.id, req.user);
+  sendResponse(res, 200, "Comment deleted", result);
 });

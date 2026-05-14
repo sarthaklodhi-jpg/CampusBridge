@@ -9,9 +9,10 @@ import { sendResponse } from "../utils/apiResponse.js";
 
 export const globalSearch = asyncHandler(async (req, res) => {
   const limit = Math.min(Math.max(parseInt(req.query.limit || "5", 10), 1), 10);
-  const query = { ...req.query, limit };
+  const term = String(req.query.q || "").trim();
+  const query = { ...req.query, q: term, limit };
   const scoped = req.user?.college ? { college: req.user.college } : {};
-  const text = req.query.q ? { $text: { $search: req.query.q } } : {};
+  const text = term ? { $text: { $search: term } } : {};
   const [posts, users, colleges, announcements, resources, events] = await Promise.all([
     postService.searchPosts(query, req.user),
     userService.searchUsers(query, req.user),
